@@ -28,7 +28,8 @@ public class DBUploader {
                     + "Quantity int,"
                     + "InvoiceDate datetime,"
                     + "Price decimal(5,2),"
-                    + "Customer_ID int,Country varchar(20)"
+                    + "Customer_ID int,"
+                    + "Country varchar(20)"
                     + ");");
             stmt.executeBatch();
         } catch (SQLException e) {
