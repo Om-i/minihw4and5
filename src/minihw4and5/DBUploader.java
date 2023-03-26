@@ -19,9 +19,9 @@ public class DBUploader {
         try {
             Connection conn = DriverManager.getConnection(DB_URL , USER , PASSWD);
             Statement stmt = conn.createStatement();
-            stmt.execute("CREATE DATABASE IF NOT EXISTS minihw4and5;");
-            stmt.execute("USE minihw4and5;");
-            stmt.execute("CREATE TABLE IF NOT EXISTS newdata_csv ("
+            stmt.addBatch("CREATE DATABASE IF NOT EXISTS minihw4and5;");
+            stmt.addBatch("USE minihw4and5;");
+            stmt.addBatch("CREATE TABLE IF NOT EXISTS newdata_csv ("
                     + "Invoice int,"
                     + "StockCode int,"
                     + "Description varchar(50),"
@@ -30,6 +30,7 @@ public class DBUploader {
                     + "Price decimal(5,2),"
                     + "Customer_ID int,Country varchar(20)"
                     + ");");
+            stmt.executeBatch();
         } catch (SQLException e) {
             e.printStackTrace();
         }
