@@ -2,16 +2,16 @@
  * Upload data to a MySQL database from a CSV file:
  *
  * While the use of java classes like Scanner/File or BufferedReader/Filereader
- * seemed to be the most straightforward approach, the time to process all the
- * entries, even if in batch, was orders of magnitude longer than what is
- * possible by letting the database to interact with the file directly.
+ * seems to be the most straightforward approach, processing all the entries,
+ * even if in batch, takes considerably longer than the time required from the
+ * the database to interact with the file directly.
  *
  * Here I used Scanner to read the queries from a .sql file, then passing the
  * instructions to the database. I used the sql command LOAD DATA LOCAL INFILE
  * to retrieve and upload the csv entry at the speed allowed by the server,
  * reducing the overhead caused by the java runtime reading entries and sending
- * queries in a loop. (the code should run approximately five times faster, for
- * approximately t00:15 for 300k+ entries)
+ * queries in a loop. (the code should run approximately five times faster,
+ * processing 340k+ entries in approximately 15 seconds)
  *
  * However, due to security concerns, local data parsing is disabled by default
  * and it must be activated either from the server configuration file, or trough
@@ -43,7 +43,7 @@ public class MiniHW4And5 {
     static void runQuery(String url, String userName, String passWord, String sqlPath) throws SQLException, FileNotFoundException {
         /*
          * Java 6 made this call unnecessary, see
-         * https://docs.oracle.com/javase/8/docs/api/java/sql/DriverManager.html
+         * https://docs.oracle.com/javase/6/docs/api/java/sql/DriverManager.html
          */
 //        Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 
@@ -70,7 +70,7 @@ public class MiniHW4And5 {
         /*
          * SEND STATEMENT AND CLOSE
          */
-        update(stmt.executeBatch()); // Run the batch and print the number of edits
+        update(stmt.executeBatch()); // Run the batch and delegates the update() method to print the number of edits
         conn.commit();               // send the instructions to the database
         conn.close();                // close the connection
         sc.close();                  // close the scanner
@@ -101,3 +101,35 @@ public class MiniHW4And5 {
     }//main
 
 }//class
+
+/*
+ * Content of the .sql file
+ */
+/*
+CREATE DATABASE IF NOT EXISTS minihw4and5; -- Creates the detabase
+USE minihw4and5;                           -- Selects the database for the following operations
+CREATE TABLE IF NOT EXISTS newdata_csv (   -- Creates the table, defining name and data type of each attribute
+	Invoice int,
+	StockCode int,
+	Description varchar(50),
+	Quantity int,
+	InvoiceDate datetime,
+	Price decimal(5,2),
+	Customer_ID int,
+	Country varchar(20)
+	);
+LOAD DATA LOCAL INFILE 'src/minihw4and5/newData.csv' INTO TABLE newdata_csv -- Loads the csv entries from the local file
+FIELDS TERMINATED BY ','                                       -- Defines the field separator
+LINES TERMINATED BY '\r\n'                                     -- Defines the line separetor (Carriage Return and Line Feed in Windows)
+IGNORE 1 LINES (                                               -- Skips the csv header values
+	Invoice,
+	StockCode,
+	Description,
+	Quantity,
+	@InvoiceDate,                                          -- This is a variable, assigned with the SET command
+	Price,
+	Customer_ID,
+	Country
+	)
+SET InvoiceDate = STR_TO_DATE(@InvoiceDate, '%d/%m/%Y %H:%i'); -- Reads the variable in the 5th field in accordance with the parameters and converts it to sql 'DATETIME' data type.
+*/
