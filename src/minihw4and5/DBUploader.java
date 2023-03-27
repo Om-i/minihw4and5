@@ -22,10 +22,13 @@
  */
 package minihw4and5;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 
 /**
  *
@@ -36,13 +39,23 @@ public class DBUploader {
     private final String USER = "pooa";
     private final String PASSWD = "pooa";
 
-//    public void query(String sql) throws SQLException{
-//        Connection conn = DriverManager.getConnection(DB_URL , USER , PASSWD);
-//        Statement stmt = conn.createStatement();
-//        stmt.addBatch(sql);
-//        stmt.executeBatch();
-//        conn.close();
-//    }
+    public void query(String sql) throws SQLException{
+        Connection conn = DriverManager.getConnection(DB_URL , USER , PASSWD);
+        Statement stmt = conn.createStatement();
+        stmt.addBatch(sql);
+        stmt.executeBatch();
+        conn.close();
+    }
+    
+    public static String[] parseHeader(String path) throws FileNotFoundException{
+        Scanner sc = new Scanner(new File(path)); // read file with scanner
+        if (sc.hasNextLine()) {
+                String header = sc.nextLine();
+                String[] attributes = header.split(",");
+                return attributes;
+        }
+        throw new IllegalArgumentException("File is empty");
+    }
     
     public void loadCSV(String csvPath) throws SQLException {
 
@@ -51,7 +64,7 @@ public class DBUploader {
 
         String sql = "LOAD DATA LOCAL INFILE '" + csvPath + "' "
                      + "INTO TABLE newdata_csv "
-                     + "FIELDS TERMINATED BY ',' " // field separator
+                     + "FIELDS TERMINATED BY ',' "  // field separator
                      + "LINES TERMINATED BY '\\n' " // line separator
                      + "IGNORE 1 LINES ("
                      + "Invoice,"
